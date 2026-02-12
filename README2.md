@@ -1,66 +1,77 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-    
-</head>
-<body>
+# ⚙️ Controle de VMs Ubuntu Server com Script
 
-<h1>Controle de VMs Ubuntu Server com Script</h1>
+<div align="center">
+  <img src="https://img.shields.io/badge/VirtualBox-7.0+-blue?style=for-the-badge&logo=virtualbox" alt="VirtualBox 7.0+">
+  <img src="https://img.shields.io/badge/Ubuntu_Server-20.04+-orange?style=for-the-badge&logo=ubuntu" alt="Ubuntu Server 20.04+">
+  <img src="https://img.shields.io/badge/Script-Bash-4EAA25?style=for-the-badge&logo=gnu-bash" alt="Script Bash">
+</div>
 
-<h2>Objetivo</h2>
-<p>O script <code>vm_control.sh</code> permite gerenciar de forma simples as VMs criadas no VirtualBox, com comandos para:</p>
-<ul>
-  <li>Iniciar VMs (start)</li>
-  <li>Desligar VMs imediatamente (stop)</li>
-  <li>Desligar VMs de forma segura (acpi)</li>
-  <li>Verificar status das VMs (status)</li>
-</ul>
+Este documento descreve o script `vm_control.sh`, uma ferramenta para gerenciar de forma eficiente as Máquinas Virtuais (VMs) do Ubuntu Server criadas no VirtualBox.
 
-<p>Ele foi projetado para funcionar com múltiplas VMs, aplicando comandos em todas de uma vez ou em uma VM específica.</p>
+## 📋 Índice
 
----
+*   [🎯 Objetivo](#-objetivo)
+*   [✅ Pré-requisitos](#-pré-requisitos)
+*   [📝 Lista de VMs Gerenciadas](#-lista-de-vms-gerenciadas)
+*   [📜 Passo a Passo do Script](#-passo-a-passo-do-script)
+    *   [1. Uso Básico](#1-uso-básico)
+    *   [2. Exemplo de Uso](#2-exemplo-de-uso)
+    *   [3. Explicação das Ações](#3-explicação-das-ações)
+    *   [4. Observações Importantes](#4-observações-importantes)
+    *   [5. Exemplo de Adição de Novas VMs](#5-exemplo-de-adição-de-novas-vms)
+*   [🏁 Conclusão](#-conclusão)
 
-<h2>Pré-requisitos</h2>
-<ul>
-  <li>Ter o VirtualBox instalado no servidor.</li>
-  <li>Ter as VMs já criadas e registradas no VirtualBox.</li>
-  <li>Permissão de usuário que pode executar <code>vboxmanage</code> (root ou sudo).</li>
-</ul>
+## 🎯 Objetivo
 
----
+O script `vm_control.sh` foi desenvolvido para simplificar o gerenciamento de VMs Ubuntu Server no VirtualBox, oferecendo comandos para:
 
-<h2>Lista de VMs gerenciadas</h2>
-<p>No script, você define um array com os nomes das VMs que deseja controlar:</p>
-<pre>
+*   **Iniciar VMs** (`start`)
+*   **Desligar VMs imediatamente** (`stop`)
+*   **Desligar VMs de forma segura** (`acpi`)
+*   **Verificar o status das VMs** (`status`)
+
+Ele é projetado para funcionar com múltiplas VMs, permitindo aplicar comandos em todas de uma vez ou em uma VM específica.
+
+## ✅ Pré-requisitos
+
+Para utilizar o script, certifique-se de que os seguintes requisitos sejam atendidos:
+
+*   **VirtualBox** instalado no servidor.
+*   **VMs já criadas** e registradas no VirtualBox.
+*   **Permissão de usuário** que pode executar `vboxmanage` (usuário `root` ou com `sudo`).
+
+## 📝 Lista de VMs Gerenciadas
+
+No script, as VMs a serem controladas são definidas em um array. Para adicionar ou remover VMs, basta editar esta linha:
+
+```bash
 VMS=("vm-ubuntu01" "vm-ubuntu02")
-</pre>
-<p>Para adicionar mais VMs, basta incluir o nome no array. Exemplo:</p>
-<pre>
-VMS=("vm-ubuntu01" "vm-ubuntu02" "vm-ubuntu03")
-</pre>
+```
 
----
+> **Exemplo:** Para incluir uma terceira VM, adicione o nome ao array:
+> `VMS=("vm-ubuntu01" "vm-ubuntu02" "vm-ubuntu03")`
 
-<h2>Passo a Passo do Script</h2>
+## 📜 Passo a Passo do Script
 
-<h3>1. Uso básico</h3>
-<pre>
+### 1. Uso Básico
+
+O script é executado via linha de comando com a seguinte sintaxe:
+
+```bash
 ./vm_control.sh {start|stop|acpi|status} [VM_NAME]
-</pre>
-<p><strong>Parâmetros:</strong></p>
-<ul>
-  <li><code>start</code> - Inicia a VM</li>
-  <li><code>stop</code> - Desliga a VM imediatamente (poweroff)</li>
-  <li><code>acpi</code> - Desliga a VM de forma segura (envia botão de energia virtual)</li>
-  <li><code>status</code> - Mostra o status atual da VM</li>
-  <li><code>VM_NAME</code> - Nome opcional da VM. Se omitido, a ação será aplicada a todas as VMs do array.</li>
-</ul>
+```
 
----
+**Parâmetros:**
 
-<h3>2. Exemplo de uso</h3>
-<pre>
+*   `start`: Inicia a VM.
+*   `stop`: Desliga a VM imediatamente (poweroff).
+*   `acpi`: Desliga a VM de forma segura (envia botão de energia virtual).
+*   `status`: Mostra o status atual da VM.
+*   `[VM_NAME]`: Nome opcional da VM. Se omitido, a ação será aplicada a todas as VMs definidas no array `VMS`.
+
+### 2. Exemplo de Uso
+
+```bash
 # Iniciar todas as VMs
 ./vm_control.sh start
 
@@ -75,45 +86,46 @@ VMS=("vm-ubuntu01" "vm-ubuntu02" "vm-ubuntu03")
 
 # Verificar status de uma VM específica
 ./vm_control.sh status vm-ubuntu01
-</pre>
+```
 
----
+### 3. Explicação das Ações
 
-<h3>3. Explicação das ações</h3>
-<table>
-  <tr><th>Ação</th><th>Descrição</th></tr>
-  <tr><td>start</td><td>Inicia a VM em modo headless (sem GUI)</td></tr>
-  <tr><td>stop</td><td>Desliga a VM imediatamente (forçado, como desligar na tomada)</td></tr>
-  <tr><td>acpi</td><td>Desliga a VM de forma segura, equivalente a enviar botão de energia virtual</td></tr>
-  <tr><td>status</td><td>Mostra informações resumidas da VM (nome e estado)</td></tr>
-</table>
+| Ação     | Descrição                                                              |
+| :------- | :--------------------------------------------------------------------- |
+| `start`  | Inicia a VM em modo headless (sem interface gráfica).                  |
+| `stop`   | Desliga a VM imediatamente (forçado, como desligar da tomada).        |
+| `acpi`   | Desliga a VM de forma segura, equivalente a enviar o botão de energia. |
+| `status` | Mostra informações resumidas da VM (nome e estado atual).              |
 
----
+### 4. Observações Importantes
 
-<h3>4. Observações importantes</h3>
-<div class="note">
-<ul>
-  <li>Se uma VM estiver ligada, você não pode alterar discos ou ISO até desligá-la.</li>
-  <li>Para adicionar novas VMs, inclua o nome no array <code>VMS</code>.</li>
-  <li>O script aplica a ação a todas as VMs se nenhum nome específico for passado.</li>
-  <li>É recomendável usar <code>acpi</code> para desligamento seguro do Ubuntu Server.</li>
-</ul>
-</div>
+*   Se uma VM estiver ligada, não é possível alterar discos ou ISOs sem desligá-la primeiro.
+*   Para adicionar novas VMs ao controle do script, inclua o nome no array `VMS`.
+*   O script aplica a ação a todas as VMs se nenhum nome específico for passado como argumento.
+*   É altamente recomendável usar a ação `acpi` para um desligamento seguro do Ubuntu Server, evitando perda de dados.
 
----
+### 5. Exemplo de Adição de Novas VMs
 
-<h3>5. Exemplo de adição de novas VMs</h3>
-<p>Suponha que você crie uma terceira VM chamada <code>vm-ubuntu03</code>:</p>
-<pre>
+Suponha que você crie uma nova VM chamada `vm-ubuntu03`. Para gerenciá-la com o script, primeiro adicione-a ao array `VMS`:
+
+```bash
 VMS=("vm-ubuntu01" "vm-ubuntu02" "vm-ubuntu03")
+```
+
+Em seguida, você pode iniciar apenas a nova VM:
+
+```bash
 ./vm_control.sh start vm-ubuntu03
-</pre>
-<p>Isso iniciará apenas a nova VM sem afetar as anteriores.</p>
+```
 
----
+Isso iniciará apenas a nova VM sem afetar as anteriores que já estão em execução ou desligadas.
 
-<h2>Conclusão</h2>
-<p>O script <code>vm_control.sh</code> oferece uma forma simples, dinâmica e segura de gerenciar múltiplas VMs no VirtualBox, permitindo iniciar, desligar ou verificar status de cada VM individualmente ou em lote. Ele é totalmente configurável, bastando editar o array <code>VMS</code> e executar os comandos desejados.</p>
+## 🏁 Conclusão
 
-</body>
-</html>
+O script `vm_control.sh` oferece uma forma simples, dinâmica e segura de gerenciar múltiplas VMs no VirtualBox. Ele permite iniciar, desligar ou verificar o status de cada VM individualmente ou em lote, sendo totalmente configurável através da edição do array `VMS`. Isso proporciona um controle eficiente e centralizado sobre o ambiente de virtualização.
+
+<div align="center">
+  Documento mantido pela equipe de Infraestrutura
+  <br>
+  Última atualização: 12/02/2026
+</div>
